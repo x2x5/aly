@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import topics from "./data.js"
+import topics from "./data/index.js"
 
 const gradients = {
   emerald: "from-emerald-500 to-teal-600",
@@ -25,7 +25,6 @@ function SlidePreview({ slide, index, total }) {
       <span className="absolute top-4 right-5 text-white/40 text-sm font-mono">
         {index} / {total}
       </span>
-
       <div className="flex items-start gap-4 mb-6">
         <span className="text-5xl md:text-6xl leading-none flex-shrink-0">
           {slide.icon}
@@ -34,16 +33,17 @@ function SlidePreview({ slide, index, total }) {
           {slide.title}
         </h2>
       </div>
-
       <ul className="space-y-3 mb-6 flex-1">
         {slide.points.map((point, i) => (
-          <li key={i} className="flex items-start gap-3 text-white/90 text-base md:text-lg leading-relaxed">
+          <li
+            key={i}
+            className="flex items-start gap-3 text-white/90 text-base md:text-lg leading-relaxed"
+          >
             <span className="text-white/60 mt-1 flex-shrink-0">◆</span>
             <span>{point}</span>
           </li>
         ))}
       </ul>
-
       <div className="bg-white/15 backdrop-blur-sm rounded-xl px-5 py-3.5 flex items-start gap-3">
         <span className="text-lg flex-shrink-0 mt-0.5">💡</span>
         <span className="text-white/85 text-sm md:text-base leading-relaxed">
@@ -54,31 +54,41 @@ function SlidePreview({ slide, index, total }) {
   )
 }
 
+function initSlideOf() {
+  return topics.map((t) => t.questions.map(() => 0))
+}
+
 export default function App() {
-  const [selected, setSelected] = useState(0)
-  const [slideOf, setSlideOf] = useState(topics.map(() => 0))
+  const [selectedTopic, setSelectedTopic] = useState(0)
+  const [selectedQuestion, setSelectedQuestion] = useState(0)
+  const [slideOf, setSlideOf] = useState(initSlideOf)
+  const [expandedTopics, setExpandedTopics] = useState(topics.map((_, i) => i === 0))
   const [collapsed, setCollapsed] = useState(false)
 
-  const topic = topics[selected]
-  const currentSlide = slideOf[selected]
-  const totalSlides = topic.slides.length
+  const topic = topics[selectedTopic]
+  const question = topic.questions[selectedQuestion]
+  const currentSlide = slideOf[selectedTopic][selectedQuestion]
+  const totalSlides = question.slides.length
 
   const goNext = useCallback(() => {
     setSlideOf((prev) => {
-      const next = [...prev]
-      if (next[selected] < topics[selected].slides.length - 1)
-        next[selected]++
+      const next = prev.map((t) => [...t])
+      if (next[selectedTopic][selectedQuestion] < question.slides.length - 1) {
+        next[selectedTopic][selectedQuestion]++
+      }
       return next
     })
-  }, [selected])
+  }, [selectedTopic, selectedQuestion, question.slides.length])
 
   const goPrev = useCallback(() => {
     setSlideOf((prev) => {
-      const next = [...prev]
-      if (next[selected] > 0) next[selected]--
+      const next = prev.map((t) => [...t])
+      if (next[selectedTopic][selectedQuestion] > 0) {
+        next[selectedTopic][selectedQuestion]--
+      }
       return next
     })
-  }, [selected])
+  }, [selectedTopic, selectedQuestion])
 
   useEffect(() => {
     function handleKey(e) {
@@ -89,6 +99,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKey)
   }, [goNext, goPrev])
 
+  const handleSelectQuestion = (ti, qi) => {
+    setSelectedTopic(ti)
+    setSelectedQuestion(qi)
+  }
+
   return (
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
       <aside
@@ -96,7 +111,7 @@ export default function App() {
           collapsed ? "w-0 p-0 overflow-hidden" : "w-72 p-5"
         }`}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
             研究课题
           </h2>
@@ -107,25 +122,62 @@ export default function App() {
             ✕
           </button>
         </div>
-        <ul className="space-y-1">
-          {topics.map((t, i) => {
-            const active = i === selected
+
+        <div className="space-y-1">
+          {topics.map((t, ti) => {
+            const isExpanded = expandedTopics[ti]
+            const hasActive = ti === selectedTopic
             return (
-              <li key={i}>
+              <div key={ti}>
                 <button
-                  onClick={() => setSelected(i)}
-                  className={`w-full text-left px-3 py-3 rounded-lg text-sm transition-colors leading-snug ${
-                    active
-                      ? "bg-indigo-600 text-white font-medium"
+                  onClick={() =>
+                    setExpandedTopics((prev) => {
+                      const next = [...prev]
+                      next[ti] = !next[ti]
+                      return next
+                    })
+                  }
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    hasActive
+                      ? "bg-indigo-600/20 text-indigo-300"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
                 >
-                  {t.title}
+                  <span className="truncate">{t.title}</span>
+                  <span
+                    className={`text-xs transition-transform ${
+                      isExpanded ? "rotate-90" : ""
+                    }`}
+                  >
+                    ▸
+                  </span>
                 </button>
-              </li>
+
+                {isExpanded && (
+                  <div className="ml-2 mt-1 space-y-0.5 border-l border-gray-700 pl-2">
+                    {t.questions.map((q, qi) => {
+                      const active =
+                        ti === selectedTopic && qi === selectedQuestion
+                      return (
+                        <button
+                          key={qi}
+                          onClick={() => handleSelectQuestion(ti, qi)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
+                            active
+                              ? "bg-indigo-600 text-white font-medium"
+                              : "text-gray-400 hover:bg-gray-700 hover:text-gray-200"
+                          }`}
+                        >
+                          {q.title}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             )
           })}
-        </ul>
+        </div>
       </aside>
 
       {collapsed && (
@@ -141,7 +193,7 @@ export default function App() {
         <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex flex-col items-center justify-center gap-6">
           <div className="w-full flex-1 min-h-0">
             <SlidePreview
-              slide={topic.slides[currentSlide]}
+              slide={question.slides[currentSlide]}
               index={currentSlide + 1}
               total={totalSlides}
             />
@@ -149,13 +201,13 @@ export default function App() {
 
           {totalSlides > 1 && (
             <div className="flex items-center gap-2">
-              {topic.slides.map((_, i) => (
+              {question.slides.map((_, i) => (
                 <button
                   key={i}
                   onClick={() =>
                     setSlideOf((prev) => {
-                      const next = [...prev]
-                      next[selected] = i
+                      const next = prev.map((t) => [...t])
+                      next[selectedTopic][selectedQuestion] = i
                       return next
                     })
                   }
