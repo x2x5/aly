@@ -4,7 +4,7 @@ export default function CompareSlide({ data, index, total }) {
   const bg = gradients[data.color] || "from-indigo-500 to-purple-600"
   return (
     <div
-      className={`relative flex flex-col bg-gradient-to-br ${bg} rounded-2xl shadow-2xl p-8 md:p-10 select-none cursor-default h-full w-full overflow-y-auto`}
+      className={`relative flex flex-col bg-gradient-to-br ${bg} p-8 md:p-10 select-none cursor-default h-full w-full overflow-y-auto`}
     >
       <span className="absolute top-4 right-5 text-white/40 text-sm font-mono">
         {index} / {total}

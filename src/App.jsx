@@ -19,7 +19,18 @@ const slideComponents = {
 function SlidePreview({ slide, index, total }) {
   const type = slide.type || "default"
   const Component = slideComponents[type] || DefaultSlide
-  return <Component data={slide} index={index} total={total} />
+  const pct = total > 1 ? ((index - 1) / (total - 1)) * 100 : 0
+  return (
+    <div className="relative h-full w-full">
+      <Component data={slide} index={index} total={total} />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+        <div
+          className="h-full bg-white/40 transition-all duration-300"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
 }
 
 function initSlideOf() {
@@ -159,37 +170,13 @@ export default function App() {
         </button>
       )}
 
-      <main className="flex-1 flex items-center justify-center p-6 md:p-10 min-w-0">
-        <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex flex-col items-center justify-center gap-6">
-          <div className="w-full flex-1 min-h-0">
-            <SlidePreview
-              slide={question.slides[currentSlide]}
-              index={currentSlide + 1}
-              total={totalSlides}
-            />
-          </div>
-
-          {totalSlides > 1 && (
-            <div className="flex items-center gap-2">
-              {question.slides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() =>
-                    setSlideOf((prev) => {
-                      const next = prev.map((t) => [...t])
-                      next[selectedTopic][selectedQuestion] = i
-                      return next
-                    })
-                  }
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === currentSlide
-                      ? "bg-indigo-400 w-4"
-                      : "bg-gray-600 hover:bg-gray-500"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
+      <main className="flex-1 min-w-0">
+        <div className="h-full w-full">
+          <SlidePreview
+            slide={question.slides[currentSlide]}
+            index={currentSlide + 1}
+            total={totalSlides}
+          />
         </div>
       </main>
     </div>
