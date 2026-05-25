@@ -5,6 +5,7 @@ export default {
       title: "论文 A：DQN 深度 Q 网络",
       slides: [
         {
+          type: "default",
           icon: "🧠",
           title: "DQN 要解决什么问题",
           points: [
@@ -16,6 +17,7 @@ export default {
           color: "blue",
         },
         {
+          type: "default",
           icon: "🏗️",
           title: "DQN 的核心创新",
           points: [
@@ -27,21 +29,44 @@ export default {
           color: "indigo",
         },
         {
-          icon: "🎮",
-          title: "实验结果：Atari 游戏",
-          points: [
-            "在 49 款 Atari 游戏中，DQN 在 29 款上超越人类",
-            "仅凭原始像素输入，无需任何手工特征",
-            "同一套架构和超参数适用于所有游戏",
+          type: "compare",
+          title: "DQN vs 传统 Q-learning",
+          leftTitle: "Q-learning",
+          leftPoints: [
+            "查表法，状态有限",
+            "逐个状态更新",
+            "数据高度相关",
+            "收敛慢",
           ],
-          tip: "这是 AI 首次学会玩 Atari 游戏，引发巨大轰动",
+          rightTitle: "DQN",
+          rightPoints: [
+            "神经网络泛化，状态无限",
+            "批量经验回放更新",
+            "Experience Replay 去相关",
+            "Target Network 稳定收敛",
+          ],
+          tip: "DQN 在 Atari 上超越了所有传统方法",
           color: "cyan",
         },
         {
+          type: "data",
+          title: "DQN 在 Atari 上的表现",
+          subtitle: "49 款游戏中 vs 人类职业玩家",
+          stats: [
+            { value: "29 / 49", label: "超越人类的游戏数" },
+            { value: "100%", label: "仅靠像素输入" },
+            { value: "750%", label: "平均 DQN 得分占比" },
+            { value: "1 套", label: "统一架构+超参" },
+          ],
+          tip: "这是 AI 首次仅凭视觉输入学会玩 Atari 游戏",
+          color: "teal",
+        },
+        {
+          type: "default",
           icon: "📉",
           title: "DQN 的局限性",
           points: [
-            "Q值估计过高（Overestimation Bias）",
+            "Q 值估计过高（Overestimation Bias）",
             "样本效率仍然较低，需要大量交互",
             "无法处理连续动作空间",
           ],
@@ -54,10 +79,11 @@ export default {
       title: "论文 B：PPO 近端策略优化",
       slides: [
         {
+          type: "default",
           icon: "🎯",
           title: "PPO 要解决什么问题",
           points: [
-            "Policy Gradient 方法步长难选 — 步长太大崩坏，太小不学",
+            "Policy Gradient 步长难选 — 太大崩坏，太小不学",
             "TRPO 虽然稳定但计算复杂、实现困难",
             "需要一种既稳定又简单易用的策略优化方法",
           ],
@@ -65,26 +91,35 @@ export default {
           color: "emerald",
         },
         {
-          icon: "⚖️",
-          title: "PPO 的核心思想：Clipped Surrogate Objective",
-          points: [
-            "限制新策略和旧策略的差异，防止更新过大",
-            "用 Clip 机制替代 TRPO 的约束优化",
-            "实现简单，只需要几行代码改动",
-          ],
-          tip: "Clip 让 PPO 既稳定又高效，成为默认的 RL 算法选择",
+          type: "quote",
+          quote: "We propose a new family of policy gradient methods for reinforcement learning, which alternate between sampling data through interaction with the environment, and optimizing a 'surrogate' objective function using stochastic gradient ascent.",
+          author: "John Schulman et al.",
+          source: "PPO 论文 (2017)",
           color: "green",
         },
         {
-          icon: "📊",
-          title: "PPO 的性能表现",
-          points: [
-            "在 MuJoCo 连续控制任务上远超 A2C 等基线",
-            "训练稳定性显著优于 Policy Gradient",
-            "计算效率高于 TRPO，适合大规模分布式训练",
+          type: "code",
+          title: "PPO Clipping 核心实现",
+          language: "python",
+          code: `ratio = torch.exp(new_log_probs - old_log_probs)
+surr1 = ratio * advantage
+surr2 = torch.clamp(ratio, 1 - eps, 1 + eps) * advantage
+loss = -torch.min(surr1, surr2).mean()`,
+          tip: "仅需几行代码实现，这是 PPO 相比 TRPO 最大的优势",
+          color: "teal",
+        },
+        {
+          type: "data",
+          title: "PPO vs 其他算法",
+          subtitle: "MuJoCo 连续控制任务平均得分",
+          stats: [
+            { value: "PPO", label: "SOTA 表现" },
+            { value: "A2C ×1.5", label: "PPO 超越幅度" },
+            { value: "3× 快", label: "相比 TRPO 训练" },
+            { value: "OpenAI", label: "默认 RL 算法" },
           ],
           tip: "OpenAI 在 Dota 2 和 Hide and Seek 项目中都使用了 PPO",
-          color: "teal",
+          color: "emerald",
         },
       ],
     },
@@ -92,6 +127,7 @@ export default {
       title: "论文 C：SAC 软演员-评论家",
       slides: [
         {
+          type: "default",
           icon: "🎭",
           title: "SAC 要解决什么问题",
           points: [
@@ -103,6 +139,7 @@ export default {
           color: "violet",
         },
         {
+          type: "default",
           icon: "🌡️",
           title: "SAC 的核心创新：最大熵",
           points: [
@@ -114,14 +151,23 @@ export default {
           color: "purple",
         },
         {
-          icon: "🏆",
-          title: "SAC 为什么是 SOTA",
-          points: [
-            "在连续控制任务上超越 PPO 和 DDPG",
-            "样本效率更高，收敛更快",
-            "超参数敏感度低，更容易调参",
+          type: "compare",
+          title: "SAC vs PPO",
+          leftTitle: "PPO",
+          leftPoints: [
+            "确定性策略优化",
+            "Clipping 限制更新",
+            "需要大量调参",
+            "探索依赖噪声",
           ],
-          tip: "SAC 是目前连续动作空间的首选算法",
+          rightTitle: "SAC",
+          rightPoints: [
+            "随机策略（最大熵）",
+            "温度系数自动调节",
+            "超参数更鲁棒",
+            "内置探索机制",
+          ],
+          tip: "SAC 是目前连续控制任务的 SOTA 算法",
           color: "fuchsia",
         },
       ],

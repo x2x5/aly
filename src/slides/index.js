@@ -1,0 +1,5 @@
+export { default as DefaultSlide } from "./DefaultSlide.jsx"
+export { default as CompareSlide } from "./CompareSlide.jsx"
+export { default as DataSlide } from "./DataSlide.jsx"
+export { default as QuoteSlide } from "./QuoteSlide.jsx"
+export { default as CodeSlide } from "./CodeSlide.jsx"

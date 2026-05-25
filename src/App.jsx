@@ -1,60 +1,25 @@
 import { useState, useEffect, useCallback } from "react"
 import topics from "./data/index.js"
+import {
+  DefaultSlide,
+  CompareSlide,
+  DataSlide,
+  QuoteSlide,
+  CodeSlide,
+} from "./slides/index.js"
 
-const gradients = {
-  emerald: "from-emerald-500 to-teal-600",
-  amber: "from-amber-500 to-orange-600",
-  rose: "from-rose-500 to-pink-600",
-  violet: "from-violet-500 to-purple-600",
-  blue: "from-blue-500 to-indigo-600",
-  cyan: "from-cyan-500 to-blue-600",
-  orange: "from-orange-500 to-red-600",
-  pink: "from-pink-500 to-rose-600",
-  slate: "from-slate-500 to-gray-600",
-  green: "from-green-500 to-emerald-600",
-  indigo: "from-indigo-500 to-blue-700",
-  yellow: "from-yellow-500 to-amber-600",
-  teal: "from-teal-500 to-cyan-600",
-  purple: "from-purple-500 to-pink-600",
-  fuchsia: "from-fuchsia-500 to-pink-600",
+const slideComponents = {
+  default: DefaultSlide,
+  compare: CompareSlide,
+  data: DataSlide,
+  quote: QuoteSlide,
+  code: CodeSlide,
 }
 
 function SlidePreview({ slide, index, total }) {
-  const bg = gradients[slide.color] || "from-indigo-500 to-purple-600"
-  return (
-    <div
-      className={`relative flex flex-col bg-gradient-to-br ${bg} rounded-2xl shadow-2xl p-8 md:p-10 select-none cursor-default h-full w-full overflow-y-auto`}
-    >
-      <span className="absolute top-4 right-5 text-white/40 text-sm font-mono">
-        {index} / {total}
-      </span>
-      <div className="flex items-start gap-4 mb-6">
-        <span className="text-5xl md:text-6xl leading-none flex-shrink-0">
-          {slide.icon}
-        </span>
-        <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
-          {slide.title}
-        </h2>
-      </div>
-      <ul className="space-y-3 mb-6 flex-1">
-        {slide.points.map((point, i) => (
-          <li
-            key={i}
-            className="flex items-start gap-3 text-white/90 text-base md:text-lg leading-relaxed"
-          >
-            <span className="text-white/60 mt-1 flex-shrink-0">◆</span>
-            <span>{point}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="bg-white/15 backdrop-blur-sm rounded-xl px-5 py-3.5 flex items-start gap-3">
-        <span className="text-lg flex-shrink-0 mt-0.5">💡</span>
-        <span className="text-white/85 text-sm md:text-base leading-relaxed">
-          {slide.tip}
-        </span>
-      </div>
-    </div>
-  )
+  const type = slide.type || "default"
+  const Component = slideComponents[type] || DefaultSlide
+  return <Component data={slide} index={index} total={total} />
 }
 
 function initSlideOf() {
@@ -65,7 +30,9 @@ export default function App() {
   const [selectedTopic, setSelectedTopic] = useState(0)
   const [selectedQuestion, setSelectedQuestion] = useState(0)
   const [slideOf, setSlideOf] = useState(initSlideOf)
-  const [expandedTopics, setExpandedTopics] = useState(topics.map((_, i) => i === 0))
+  const [expandedTopics, setExpandedTopics] = useState(
+    topics.map((_, i) => i === 0)
+  )
   const [collapsed, setCollapsed] = useState(false)
 
   const topic = topics[selectedTopic]
