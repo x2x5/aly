@@ -1,16 +1,54 @@
 import { useState, useEffect, useCallback } from "react"
 import topics from "./data.js"
 
+const gradients = {
+  emerald: "from-emerald-500 to-teal-600",
+  amber: "from-amber-500 to-orange-600",
+  rose: "from-rose-500 to-pink-600",
+  violet: "from-violet-500 to-purple-600",
+  blue: "from-blue-500 to-indigo-600",
+  cyan: "from-cyan-500 to-blue-600",
+  orange: "from-orange-500 to-red-600",
+  pink: "from-pink-500 to-rose-600",
+  slate: "from-slate-500 to-gray-600",
+  green: "from-green-500 to-emerald-600",
+  indigo: "from-indigo-500 to-blue-700",
+  yellow: "from-yellow-500 to-amber-600",
+}
+
 function SlidePreview({ slide, index, total }) {
+  const bg = gradients[slide.color] || "from-indigo-500 to-purple-600"
   return (
-    <div className="relative flex items-center justify-center h-full w-full bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-2xl p-12 select-none cursor-default">
-      <span className="absolute top-4 right-5 text-white/50 text-sm font-mono">
+    <div
+      className={`relative flex flex-col bg-gradient-to-br ${bg} rounded-2xl shadow-2xl p-8 md:p-10 select-none cursor-default h-full w-full overflow-y-auto`}
+    >
+      <span className="absolute top-4 right-5 text-white/40 text-sm font-mono">
         {index} / {total}
       </span>
-      <div className="text-center">
-        <p className="text-2xl md:text-3xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-          {slide.content}
-        </p>
+
+      <div className="flex items-start gap-4 mb-6">
+        <span className="text-5xl md:text-6xl leading-none flex-shrink-0">
+          {slide.icon}
+        </span>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
+          {slide.title}
+        </h2>
+      </div>
+
+      <ul className="space-y-3 mb-6 flex-1">
+        {slide.points.map((point, i) => (
+          <li key={i} className="flex items-start gap-3 text-white/90 text-base md:text-lg leading-relaxed">
+            <span className="text-white/60 mt-1 flex-shrink-0">◆</span>
+            <span>{point}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="bg-white/15 backdrop-blur-sm rounded-xl px-5 py-3.5 flex items-start gap-3">
+        <span className="text-lg flex-shrink-0 mt-0.5">💡</span>
+        <span className="text-white/85 text-sm md:text-base leading-relaxed">
+          {slide.tip}
+        </span>
       </div>
     </div>
   )
@@ -55,12 +93,12 @@ export default function App() {
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
       <aside
         className={`bg-gray-800 border-r border-gray-700 flex-shrink-0 overflow-y-auto transition-all duration-300 ${
-          collapsed ? "w-0 p-0 overflow-hidden" : "w-64 p-5"
+          collapsed ? "w-0 p-0 overflow-hidden" : "w-72 p-5"
         }`}
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-            话题
+            研究课题
           </h2>
           <button
             onClick={() => setCollapsed(true)}
@@ -76,7 +114,7 @@ export default function App() {
               <li key={i}>
                 <button
                   onClick={() => setSelected(i)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  className={`w-full text-left px-3 py-3 rounded-lg text-sm transition-colors leading-snug ${
                     active
                       ? "bg-indigo-600 text-white font-medium"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -99,7 +137,7 @@ export default function App() {
         </button>
       )}
 
-      <main className="flex-1 flex items-center justify-center p-8 min-w-0">
+      <main className="flex-1 flex items-center justify-center p-6 md:p-10 min-w-0">
         <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex flex-col items-center justify-center gap-6">
           <div className="w-full flex-1 min-h-0">
             <SlidePreview
