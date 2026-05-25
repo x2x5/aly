@@ -14,6 +14,9 @@ const gradients = {
   green: "from-green-500 to-emerald-600",
   indigo: "from-indigo-500 to-blue-700",
   yellow: "from-yellow-500 to-amber-600",
+  teal: "from-teal-500 to-cyan-600",
+  purple: "from-purple-500 to-pink-600",
+  fuchsia: "from-fuchsia-500 to-pink-600",
 }
 
 function SlidePreview({ slide, index, total }) {
